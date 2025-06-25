@@ -39,6 +39,15 @@ public class MemberController {
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             @RequestPart("userData") String userDataJson) {
 
+        System.out.println("=== 컨트롤러 요청 받음 ===");
+        System.out.println("profileImage null 여부: " + (profileImage == null));
+        if (profileImage != null) {
+            System.out.println("파일명: " + profileImage.getOriginalFilename());
+            System.out.println("파일 크기: " + profileImage.getSize());
+            System.out.println("Content Type: " + profileImage.getContentType());
+        }
+        System.out.println("userData: " + userDataJson);
+
         // JSON 데이터를 DTO로 변환
         SignUpRequestDto request;
         try {

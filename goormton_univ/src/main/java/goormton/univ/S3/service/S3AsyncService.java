@@ -19,6 +19,9 @@ public class S3AsyncService {
     @Value("${aws.s3-bucket}")
     private String bucketName;
 
+    @Value("${aws.region}")
+    private String region;
+
     public S3AsyncService(S3AsyncClient s3AsyncClient) {
         this.s3AsyncClient = s3AsyncClient;
     }
@@ -38,7 +41,7 @@ public class S3AsyncService {
         return s3AsyncClient.putObject(putObjectRequest, AsyncRequestBody.fromByteBuffer(ByteBuffer.wrap(fileData)))
                 .thenApply(response -> {
                     if (response.sdkHttpResponse().isSuccessful()) {
-                        return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;
+                        return "https://" + bucketName + ".s3." + region + "amazonaws.com/" + fileName;
                     } else {
                         throw new RuntimeException("S3 업로드 실패: " + response.sdkHttpResponse().statusCode());
                     }

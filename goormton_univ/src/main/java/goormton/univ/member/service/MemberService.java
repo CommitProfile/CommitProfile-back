@@ -55,17 +55,29 @@ public class MemberService {
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // 프로필 이미지 업로드 (비동기 처리)
-        String pathPrefix = "profile_images/" + request.getNickName();
-        String defaultImageUrl = "";
+        String pathPrefix = "profile_images";
+        String defaultImageUrl = "https://default-image-url.com/default.png";
+
+        System.out.println("=== S3 업로드 시작 ===");
+        System.out.println("파일명: " + (profileImage != null ? profileImage.getOriginalFilename() : "null"));
+        System.out.println("파일 크기: " + (profileImage != null ? profileImage.getSize() : "null"));
+        System.out.println("경로: " + pathPrefix);
+
         CompletableFuture<String> profileImageUrlFuture = s3UploadUtil.uploadImageAsync(profileImage, pathPrefix, defaultImageUrl);
 
-        // 업로드 완료 후 Member 저장
-        return profileImageUrlFuture.thenAccept(profileImageUrl -> {
-            Member member = new Member(request.getEmail(), encodedPassword, request.getNickName(), profileImageUrl, request.getName());
-            member.setCreatedAt(LocalDateTime.now());
-            memberRepository.save(member);
-        });
+        return profileImageUrlFuture
+                .thenAccept(profileImageUrl -> {
+                    System.out.println("업로드된 이미지 URL: " + profileImageUrl);
+                    Member member = new Member(request.getEmail(), encodedPassword, request.getNickName(), profileImageUrl, request.getName());
+                    member.setCreatedAt(LocalDateTime.now());
+                    memberRepository.save(member);
+                    System.out.println("회원 저장 완료");
+                })
+                .exceptionally(ex -> {
+                    System.err.println("S3 업로드 실패: " + ex.getMessage());
+                    ex.printStackTrace();
+                    return null;
+                });
     }
 
     /**
@@ -144,6 +156,12 @@ public class MemberService {
         // 이름 변경
         if (request.getName() != null && !request.getName().isBlank()) {
             member.setName(request.getName());
+        }
+
+        // 비밀번호 변경
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
+            member.setPassword(encodedPassword);
         }
 
         String pathPrefix = "profile_images/" + member.getNickName();
