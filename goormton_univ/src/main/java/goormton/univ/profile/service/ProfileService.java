@@ -43,6 +43,11 @@ public class ProfileService {
         Profile profile = profileRepository.findByMemberId(memberId)
                         .orElseThrow(() -> new IllegalArgumentException("프로필이 존재하지 않습니다."));
 
+        // 본인 권한 검증 추가!
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new SecurityException("본인의 프로필만 수정할 수 있습니다.");
+        }
+
         // 요청에서 null이 아닌 값만 업데이트 (기존 값은 유지)
         if (requestDto.getIntroduction() != null) {
             profile.setIntroduction(requestDto.getIntroduction());
