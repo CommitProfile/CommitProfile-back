@@ -1,6 +1,7 @@
 package goormton.univ.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import goormton.univ.profile.entity.Profile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,8 +18,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class
-Member {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +43,9 @@ Member {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SS")
     private LocalDateTime createdAt;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Profile profile;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = java.time.LocalDateTime.now();
@@ -54,5 +57,13 @@ Member {
         this.nickName = nickName;
         this.profileImageUrl = profileImageUrl;
         this.name = name;
+    }
+
+    //연관관계 메서드
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+        if (profile.getMember() != this) {
+            profile.setMember(this);
+        }
     }
 }
