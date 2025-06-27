@@ -1,12 +1,12 @@
 package goormton.univ.project.domain;
 
-import goormton.univ.user.domain.User;
+import goormton.univ.member.entity.Member;
+import goormton.univ.project.dto.ProjectRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,8 +25,20 @@ public class Project {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")  // FK
-    private User user;
+    @JoinColumn(name = "member_id")  // FK
+    private Member member;
+
+    public void updateFrom(ProjectRequest request, Member member) {
+        this.projectName = request.getProjectName();
+        this.teamName = request.getTeamName();
+        this.description = request.getDescription();
+        this.period = request.getPeriod();
+        this.techStack = request.getTechStack();
+        this.githubUrl = request.getGithubUrl();
+        this.contributionDescription = request.getContributionDescription();
+        this.member = member;
+    }
+
 
 
 }

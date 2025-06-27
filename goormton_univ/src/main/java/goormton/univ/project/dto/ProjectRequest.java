@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ProjectRequest {
 
     private Long id;
-    private Long userId;
+    private Long memberId;
     private String projectName;
     private String teamName;
     private String description;

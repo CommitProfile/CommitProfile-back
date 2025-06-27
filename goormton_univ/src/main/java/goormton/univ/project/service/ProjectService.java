@@ -1,11 +1,11 @@
 package goormton.univ.project.service;
 
+import goormton.univ.member.entity.Member;
+import goormton.univ.member.repository.MemberRepository;
 import goormton.univ.project.domain.Project;
 import goormton.univ.project.dto.ProjectRequest;
 import goormton.univ.project.dto.ProjectResponse;
 import goormton.univ.project.repository.ProjectRepository;
-import goormton.univ.user.domain.User;
-import goormton.univ.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
 
     public Long saveProject(ProjectRequest request) {
         validateRequest(request);
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 사용자가 존재하지 않습니다."));
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 멤버가 존재하지 않습니다."));
         Project project = Project.builder()
                 .projectName(request.getProjectName())
                 .teamName(request.getTeamName())
@@ -34,13 +34,13 @@ public class ProjectService {
                 .techStack(request.getTechStack())
                 .githubUrl(request.getGithubUrl())
                 .contributionDescription(request.getContributionDescription())
-                .user(user)
+                .member(member)
                 .build();
 
         return projectRepository.save(project).getId();
     }
 
-    public ProjectResponse searchById(Long id){
+    public ProjectResponse searchById(Long id) {
         return toResponseDTO(projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 프로젝트가 존재하지 않습니다.")));
 
@@ -66,25 +66,16 @@ public class ProjectService {
 
     // 수정
     public void updateProject(Long id, ProjectRequest request) {
-
         validateRequest(request);
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 프로젝트가 존재하지 않습니다."));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 사용자가 존재하지 않습니다."));
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 멤버가 존재하지 않습니다."));
 
-        project.setProjectName(request.getProjectName());
-        project.setTeamName(request.getTeamName());
-        project.setDescription(request.getDescription());
-        project.setPeriod(request.getPeriod());
-        project.setTechStack(request.getTechStack());
-        project.setGithubUrl(request.getGithubUrl());
-        project.setContributionDescription(request.getContributionDescription());
-        project.setUser(user);
+        project.updateFrom(request, member);
     }
-
 
 
     // 삭제
@@ -93,7 +84,6 @@ public class ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 프로젝트가 존재하지 않습니다."));
         projectRepository.delete(project);
     }
-
 
 
     // 내부 변환 메서드
@@ -107,7 +97,8 @@ public class ProjectService {
                 .techStack(project.getTechStack())
                 .githubUrl(project.getGithubUrl())
                 .contributionDescription(project.getContributionDescription())
-                .userId(project.getUser().getId())
+                .memberId(project.getMember().getId())
+
                 .build();
     }
 
@@ -117,11 +108,10 @@ public class ProjectService {
     }
 
 
-
     private void validateRequest(ProjectRequest request) {
         if (request.getProjectName() == null || request.getProjectName().trim().isEmpty()
                 || request.getTechStack() == null || request.getTechStack().trim().isEmpty()
-                || request.getUserId()==null) {
+                || request.getMemberId() == null) {
             throw new IllegalArgumentException("입력값 중 유효하지 않은 항목이 있습니다.");
         }
     }

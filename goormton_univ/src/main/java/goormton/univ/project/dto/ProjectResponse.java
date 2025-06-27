@@ -7,10 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
 public class ProjectResponse {
-    private Long id;                         // Project PK
-    private Long userId;
+    private Long id;      // Project PK
+    private Long memberId;
 
     private String projectName;
     private String teamName;
