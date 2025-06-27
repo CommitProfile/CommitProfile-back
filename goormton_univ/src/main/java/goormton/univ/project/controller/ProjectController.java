@@ -17,9 +17,9 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping("/info")
-    public ResponseEntity<Long> createProject(@RequestBody ProjectRequest request){
+    public ResponseEntity<String> createProject(@RequestBody ProjectRequest request){
         Long projectId = projectService.saveProject(request);
-        return ResponseEntity.ok(projectId);
+        return ResponseEntity.ok("프로젝트 생성 완료 (ID: " + projectId + ")");
     }
 
     @GetMapping("/{id}")
@@ -34,22 +34,22 @@ public class ProjectController {
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/search") //예시 search?keyword=2023.11
+    @GetMapping("/search") //예시
     public ResponseEntity<List<ProjectResponse>> searchByPeriod(@RequestParam String keyword) {
         List<ProjectResponse> responseList = projectService.searchByPeriod(keyword);
         return ResponseEntity.ok(responseList);
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<Void> updateProject(@PathVariable Long id, @RequestBody ProjectRequest request) {
+    public ResponseEntity<String> updateProject(@PathVariable Long id, @RequestBody ProjectRequest request) {
         projectService.updateProject(id, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("프로젝트 수정 완료");
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("프로젝트 삭제 완료");
     }
 
 }
