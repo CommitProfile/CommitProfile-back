@@ -1,4 +1,4 @@
-package goormton.univ.project.Repo.Config;
+package goormton.univ.Repo.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

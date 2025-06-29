@@ -1,4 +1,4 @@
-package goormton.univ.project.Repo.Dto;
+package goormton.univ.Repo.Dto;
 
 import java.util.List;
 

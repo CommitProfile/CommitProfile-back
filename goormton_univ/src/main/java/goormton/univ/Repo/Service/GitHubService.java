@@ -1,9 +1,9 @@
-package goormton.univ.project.Repo.Service;
+package goormton.univ.Repo.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import goormton.univ.project.Repo.Dto.GitHubRequest;
-import goormton.univ.project.Repo.Dto.GitHubResponse;
+import goormton.univ.Repo.Dto.GitHubRequest;
+import goormton.univ.Repo.Dto.GitHubResponse;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;

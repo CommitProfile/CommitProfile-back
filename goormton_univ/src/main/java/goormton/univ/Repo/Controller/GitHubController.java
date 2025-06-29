@@ -1,8 +1,8 @@
-package goormton.univ.project.Repo.Controller;
+package goormton.univ.Repo.Controller;
 
-import goormton.univ.project.Repo.Dto.GitHubRequest;
-import goormton.univ.project.Repo.Dto.GitHubResponse;
-import goormton.univ.project.Repo.Service.GitHubService;
+import goormton.univ.Repo.Dto.GitHubRequest;
+import goormton.univ.Repo.Dto.GitHubResponse;
+import goormton.univ.Repo.Service.GitHubService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/CommitProfile-back.iml" filepath="$PROJECT_DIR$/.idea/CommitProfile-back.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/goormton_univ.main.iml" filepath="$PROJECT_DIR$/.idea/modules/goormton_univ.main.iml" />
     </modules>
   </component>
 </project>
