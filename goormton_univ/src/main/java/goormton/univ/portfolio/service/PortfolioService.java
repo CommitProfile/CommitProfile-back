@@ -1,14 +1,13 @@
 package goormton.univ.portfolio.service;
 
-import goormton.univ.portfolio.dto.PortfolioCreateDto;
-import goormton.univ.portfolio.dto.PortfolioResponseDto;
-import goormton.univ.portfolio.dto.PortfolioUpdateDto;
+import goormton.univ.portfolio.dto.*;
 import org.springframework.stereotype.Service;
 
 public interface PortfolioService {
+    Long saveUserInfo(PortfolioAboutMeDto dto);
+    Long saveProjectInfo(Long portfolioId, PortfolioProjectListDto portfolioProjectListDto);
     PortfolioResponseDto findById(Long id);
-    void update(Long id, PortfolioUpdateDto request);
+    Long saveGithubStats(Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto);
     void delete(Long id);
-    Long create(PortfolioCreateDto portfolioCreateDto);
-
+    Long saveCommitMessages(Long portfolioId, PortfolioCommitMessageDto dto);
 }

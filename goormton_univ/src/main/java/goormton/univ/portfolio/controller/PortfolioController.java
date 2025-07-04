@@ -1,8 +1,6 @@
 package goormton.univ.portfolio.controller;
 
-import goormton.univ.portfolio.dto.PortfolioCreateDto;
-import goormton.univ.portfolio.dto.PortfolioResponseDto;
-import goormton.univ.portfolio.dto.PortfolioUpdateDto;
+import goormton.univ.portfolio.dto.*;
 import goormton.univ.portfolio.service.PdfGenerator;
 import goormton.univ.portfolio.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +26,6 @@ public class PortfolioController {
         return ResponseEntity.ok(portfolio);
     }
 
-    // 포트폴리오 수정
-    @PutMapping("/{portfolioId}")
-    public ResponseEntity<Void> updatePortfolio(@PathVariable Long portfolioId,
-                                                @RequestBody PortfolioUpdateDto request) {
-        portfolioService.update(portfolioId, request);
-        return ResponseEntity.noContent().build();
-    }
 
     // 포트폴리오 삭제
     @DeleteMapping("/{portfolioId}")
@@ -43,11 +34,39 @@ public class PortfolioController {
         return ResponseEntity.noContent().build();
     }
 
-    // 포트폴리오 생성
-    @PostMapping
-    public ResponseEntity<Long> createPortfolio(@RequestBody PortfolioCreateDto portfolioCreateDto) {
-        Long createdId = portfolioService.create(portfolioCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
+    // aboutme 정보 저장
+    @PostMapping("/about-me")
+    public ResponseEntity<Long> saveUserInfo(@RequestBody PortfolioAboutMeDto dto) {
+        Long portfolioId = portfolioService.saveUserInfo(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(portfolioId);
+    }
+
+    // 프로젝트 정보 저장 (서비스 로고 수정 예정)
+    @PostMapping("/{portfolioId}/projects")
+    public ResponseEntity<Long> saveProjectInfo(
+            @PathVariable Long portfolioId,
+            @RequestBody PortfolioProjectListDto portfolioProjectListDto) {
+        Long updatedId = portfolioService.saveProjectInfo(portfolioId, portfolioProjectListDto);
+        return ResponseEntity.ok(updatedId);
+    }
+
+    @PostMapping("/{portfolioId}/github-stats")
+    public ResponseEntity<Long> saveGithubStats(
+            @PathVariable Long portfolioId,
+            @RequestBody PortfolioGithubStatDto githubStatDto
+    ) {
+        Long updatedId = portfolioService.saveGithubStats(portfolioId, githubStatDto);
+        return ResponseEntity.ok(updatedId);
+    }
+
+    // 커밋 메시지 저장
+    @PostMapping("/{portfolioId}/commit-messages")
+    public ResponseEntity<Long> saveCommitMessages(
+            @PathVariable Long portfolioId,
+            @RequestBody PortfolioCommitMessageDto dto
+    ) {
+        Long updatedId = portfolioService.saveCommitMessages(portfolioId, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedId);
     }
 
     // 포트폴리오 PDF 다운로드 (추후 수정 가능)
