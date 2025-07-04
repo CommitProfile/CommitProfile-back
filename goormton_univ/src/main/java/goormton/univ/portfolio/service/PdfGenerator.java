@@ -1,19 +1,24 @@
 package goormton.univ.portfolio.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import goormton.univ.portfolio.entity.Portfolio;
-import goormton.univ.portfolio.repository.ProtfolioRepository;
+import goormton.univ.portfolio.repository.PortfolioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class PdfGenerator {
 
-    private final ProtfolioRepository portfolioRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final ObjectMapper objectMapper;
 
     public byte[] generatePortfolioPdf(Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
@@ -27,8 +32,7 @@ public class PdfGenerator {
         }
     }
 
-    // HTML을 PDF로 변환
-    public byte[] generatePdfFromHtml(String htmlContent) {
+    private byte[] generatePdfFromHtml(String htmlContent) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(htmlContent);
@@ -40,22 +44,61 @@ public class PdfGenerator {
         }
     }
 
-    // HTML 생성 함수
     private String generateHtmlFromPortfolio(Portfolio portfolio) {
-        return """
+        StringBuilder html = new StringBuilder();
+
+        html.append("""
             <html>
                 <head>
                     <style>
                         body { font-family: 'Arial', sans-serif; padding: 20px; }
                         h1 { color: #333; }
-                        p { font-size: 14px; }
+                        h2 { color: #555; }
+                        p, li { font-size: 14px; line-height: 1.6; }
                     </style>
                 </head>
                 <body>
                     <h1>포트폴리오</h1>
-                    <p>%s</p>
-                </body>
-            </html>
-            """.formatted(portfolio.getPortfolioText());
+                    <h2>생성일: %s</h2>
+                """.formatted(portfolio.getCreatedAt()));
+
+        // 유저 정보
+        html.append("<h2>About Me</h2>");
+        try {
+            Map<String, String> userInfo = objectMapper.readValue(
+                    portfolio.getUserInfoJson(), new TypeReference<>() {});
+            for (Map.Entry<String, String> entry : userInfo.entrySet()) {
+                html.append("<p><strong>")
+                        .append(entry.getKey())
+                        .append(":</strong> ")
+                        .append(entry.getValue())
+                        .append("</p>");
+            }
+        } catch (Exception e) {
+            html.append("<p>사용자 정보 파싱 실패</p>");
+        }
+
+        // 프로젝트 정보
+        html.append("<h2>Projects</h2>");
+        try {
+            List<Map<String, String>> projects = objectMapper.readValue(
+                    portfolio.getProjectsJson(), new TypeReference<List<Map<String, String>>>() {});
+            for (Map<String, String> project : projects) {
+                html.append("<ul>");
+                for (Map.Entry<String, String> entry : project.entrySet()) {
+                    html.append("<li><strong>")
+                            .append(entry.getKey())
+                            .append(":</strong> ")
+                            .append(entry.getValue())
+                            .append("</li>");
+                }
+                html.append("</ul><br/>");
+            }
+        } catch (Exception e) {
+            html.append("<p>프로젝트 정보 파싱 실패</p>");
+        }
+
+        html.append("</body></html>");
+        return html.toString();
     }
 }
