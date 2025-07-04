@@ -1,13 +1,15 @@
 package goormton.univ.portfolio.service;
 
 import goormton.univ.portfolio.dto.*;
+import goormton.univ.portfolio.entity.Portfolio;
 import org.springframework.stereotype.Service;
 
 public interface PortfolioService {
-    Long saveUserInfo(PortfolioAboutMeDto dto);
-    Long saveProjectInfo(Long portfolioId, PortfolioProjectListDto portfolioProjectListDto);
-    PortfolioResponseDto findById(Long id);
-    Long saveGithubStats(Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto);
-    void delete(Long id);
-    Long saveCommitMessages(Long portfolioId, PortfolioCommitMessageDto dto);
+    void validateOwnership(Long memberId, Portfolio portfolio);
+    Long saveUserInfo(Long memberId, PortfolioAboutMeDto dto);
+    Long saveProjectInfo(Long memberId, Long portfolioId, PortfolioProjectListDto portfolioProjectListDto);
+    PortfolioResponseDto findById(Long memberId, Long portfolioId);
+    Long saveGithubStats(Long memberId, Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto);
+    void delete(Long memberId, Long portfolioId);
+    Long saveCommitMessages(Long memberId, Long portfolioId, PortfolioCommitMessageDto dto);
 }

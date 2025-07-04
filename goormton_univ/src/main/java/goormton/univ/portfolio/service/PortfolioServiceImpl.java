@@ -3,6 +3,8 @@ package goormton.univ.portfolio.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goormton.univ.member.entity.Member;
+import goormton.univ.member.repository.MemberRepository;
 import goormton.univ.portfolio.dto.*;
 import goormton.univ.portfolio.entity.AboutMeField;
 import goormton.univ.portfolio.entity.GithubStatField;
@@ -24,12 +26,22 @@ import java.util.stream.Collectors;
 public class PortfolioServiceImpl implements PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
+    private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
 
     @Override
-    public Long saveUserInfo(PortfolioAboutMeDto portfolioAboutMeDto) {
+    public void validateOwnership(Long memberId, Portfolio portfolio) {
+        if (!portfolio.getMember().getId().equals(memberId)) {
+            throw new IllegalArgumentException("해당 포트폴리오에 접근할 권한이 없습니다.");
+        }
+    }
+
+    @Override
+    public Long saveUserInfo(Long memberId, PortfolioAboutMeDto portfolioAboutMeDto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 멤버가 존재하지 않습니다."));
         Portfolio portfolio = new Portfolio();
-        portfolio.markPortfolioCreated(LocalDateTime.now());
+        portfolio.initializePortfolio(member, LocalDateTime.now());
 
         // 포함된 필드만 골라서 Map으로 구성
         Map<String, String> filtered = new LinkedHashMap<>();
@@ -52,9 +64,10 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public Long saveProjectInfo(Long portfolioId,  PortfolioProjectListDto portfolioProjectListDto) {
+    public Long saveProjectInfo(Long memberId, Long portfolioId,  PortfolioProjectListDto portfolioProjectListDto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 포트폴리오가 존재하지 않습니다."));
+        validateOwnership(memberId, portfolio);
 
         List<Map<String, String>> projectList = new ArrayList<>();
 
@@ -79,9 +92,10 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public Long saveGithubStats(Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto) {
+    public Long saveGithubStats(Long memberId, Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 포트폴리오가 존재하지 않습니다."));
+        validateOwnership(memberId, portfolio);
 
         Map<String, String> filtered = new LinkedHashMap<>();
         for (GithubStatField field : portfolioGithubStatDto.getIncludedFields()) {
@@ -101,9 +115,10 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public Long saveCommitMessages(Long portfolioId, PortfolioCommitMessageDto dto) {
+    public Long saveCommitMessages(Long memberId, Long portfolioId, PortfolioCommitMessageDto dto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("포트폴리오가 존재하지 않습니다."));
+        validateOwnership(memberId, portfolio);
 
         // included == true 인 메시지만 필터링
         List<String> includedMessages = dto.getMessages().stream()
@@ -122,15 +137,22 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public PortfolioResponseDto findById(Long id) {
-        Portfolio portfolio = portfolioRepository.findById(id)
+    public PortfolioResponseDto findById(Long memberId, Long portfolioId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("포트폴리오가 존재하지 않습니다."));
+        validateOwnership(memberId, portfolio);
+
         return PortfolioResponseDto.fromEntity(portfolio);
     }
 
     @Override
-    public void delete(Long portfolioId) {
-        portfolioRepository.deleteById(portfolioId);
+    public void delete(Long memberId, Long portfolioId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new EntityNotFoundException("포트폴리오가 존재하지 않습니다."));
+
+        validateOwnership(memberId, portfolio);
+
+        portfolioRepository.delete(portfolio);
     }
 
     private String extractAboutMeFieldValue(AboutMeField field, PortfolioAboutMeDto dto) {

@@ -20,9 +20,16 @@ public class PdfGenerator {
     private final PortfolioRepository portfolioRepository;
     private final ObjectMapper objectMapper;
 
-    public byte[] generatePortfolioPdf(Long portfolioId) {
+    public void validateOwnership(Long memberId, Portfolio portfolio) {
+        if (!portfolio.getMember().getId().equals(memberId)) {
+            throw new IllegalArgumentException("해당 포트폴리오에 접근할 권한이 없습니다.");
+        }
+    }
+
+    public byte[] generatePortfolioPdf(Long memberId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 포트폴리오가 존재하지 않습니다."));
+        validateOwnership(memberId, portfolio);
 
         String htmlContent = generateHtmlFromPortfolio(portfolio);
         try {

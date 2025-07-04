@@ -1,5 +1,6 @@
 package goormton.univ.portfolio.entity;
 
+import goormton.univ.member.entity.Member;
 import goormton.univ.portfolio.dto.PortfolioCreateDto;
 import goormton.univ.portfolio.dto.PortfolioUpdateDto;
 import jakarta.persistence.*;
@@ -17,6 +18,9 @@ public class Portfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long portfolioId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(columnDefinition = "json")
     private String userInfoJson;
@@ -32,10 +36,10 @@ public class Portfolio {
 
     private LocalDateTime createdAt;
 
-    public void markPortfolioCreated(LocalDateTime createdAt) {
+    public void initializePortfolio(Member member, LocalDateTime createdAt) {
+        this.member = member;
         this.createdAt = createdAt;
     }
-
     public void saveUserInfoJson(String userInfoJson){
         this.userInfoJson = userInfoJson;
     }
