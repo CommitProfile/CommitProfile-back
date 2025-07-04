@@ -9,7 +9,7 @@ public interface PortfolioService {
     Long saveUserInfo(Long memberId, PortfolioAboutMeDto dto);
     Long saveProjectInfo(Long memberId, Long portfolioId, PortfolioProjectListDto portfolioProjectListDto);
     PortfolioResponseDto findById(Long memberId, Long portfolioId);
-    Long saveGithubStats(Long memberId, Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto);
+    Long saveGithubStats(Long memberId, Long portfolioId, PortfolioGithubStatListDto portfolioGithubStatListDto);
     void delete(Long memberId, Long portfolioId);
-    Long saveCommitMessages(Long memberId, Long portfolioId, PortfolioCommitMessageDto dto);
+    Long saveCommitMessages(Long memberId, Long portfolioId, PortfolioCommitMessageListDto portfolioCommitMessageListDto);
 }

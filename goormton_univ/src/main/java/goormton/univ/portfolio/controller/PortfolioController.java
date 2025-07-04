@@ -61,10 +61,10 @@ public class PortfolioController {
     public ResponseEntity<Long> saveGithubStats(
             @RequestHeader("Authorization") String token,
             @PathVariable Long portfolioId,
-            @RequestBody PortfolioGithubStatDto githubStatDto
+            @RequestBody PortfolioGithubStatListDto portfolioGithubStatListDto
     ) {
         Long memberId = jwtUtil.extractMemberId(token);
-        Long updatedId = portfolioService.saveGithubStats(memberId, portfolioId, githubStatDto);
+        Long updatedId = portfolioService.saveGithubStats(memberId, portfolioId, portfolioGithubStatListDto);
         return ResponseEntity.ok(updatedId);
     }
 
@@ -73,10 +73,10 @@ public class PortfolioController {
     public ResponseEntity<Long> saveCommitMessages(
             @RequestHeader("Authorization") String token,
             @PathVariable Long portfolioId,
-            @RequestBody PortfolioCommitMessageDto portfolioCommitMessageDto
+            @RequestBody PortfolioCommitMessageListDto portfolioCommitMessageListDto
     ) {
         Long memberId = jwtUtil.extractMemberId(token);
-        Long updatedId = portfolioService.saveCommitMessages(memberId, portfolioId, portfolioCommitMessageDto);
+        Long updatedId = portfolioService.saveCommitMessages(memberId, portfolioId, portfolioCommitMessageListDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedId);
     }
 

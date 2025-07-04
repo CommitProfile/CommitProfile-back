@@ -92,16 +92,19 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public Long saveGithubStats(Long memberId, Long portfolioId, PortfolioGithubStatDto portfolioGithubStatDto) {
+    public Long saveGithubStats(Long memberId, Long portfolioId, PortfolioGithubStatListDto portfolioGithubStatListDto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 포트폴리오가 존재하지 않습니다."));
         validateOwnership(memberId, portfolio);
 
         Map<String, String> filtered = new LinkedHashMap<>();
-        for (GithubStatField field : portfolioGithubStatDto.getIncludedFields()) {
-            String value = extractGitStatFieldValue(field, portfolioGithubStatDto);
-            if (value != null && !value.isBlank()) {
-                filtered.put(field.name().toLowerCase(), value);
+
+        for (PortfolioGithubStatDto dto : portfolioGithubStatListDto.getGithubStats()) {
+            for (GithubStatField field : dto.getIncludedFields()) {
+                String value = extractGitStatFieldValue(field, dto);
+                if (value != null && !value.isBlank()) {
+                    filtered.put(field.name().toLowerCase(), value);
+                }
             }
         }
 
@@ -115,17 +118,18 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public Long saveCommitMessages(Long memberId, Long portfolioId, PortfolioCommitMessageDto dto) {
+    public Long saveCommitMessages(Long memberId, Long portfolioId, PortfolioCommitMessageListDto dto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("포트폴리오가 존재하지 않습니다."));
         validateOwnership(memberId, portfolio);
 
-        // included == true 인 메시지만 필터링
-        List<String> includedMessages = dto.getMessages().stream()
+        // dto 내부의 각 PortfolioCommitMessageDto에서 포함된 커밋 메시지만 추출
+        List<String> includedMessages = dto.getGithubStats().stream()
+                .flatMap(commitDto -> commitDto.getMessages().stream())
                 .filter(CommitMessageDto::isIncluded)
                 .map(CommitMessageDto::getMessage)
                 .filter(msg -> msg != null && !msg.isBlank())
-                .collect(Collectors.toList());
+                .toList();
 
         try {
             String json = objectMapper.writeValueAsString(includedMessages);
