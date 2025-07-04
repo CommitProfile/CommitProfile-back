@@ -2,10 +2,7 @@ package goormton.univ.portfolio.entity;
 
 import goormton.univ.portfolio.dto.PortfolioCreateDto;
 import goormton.univ.portfolio.dto.PortfolioUpdateDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,24 +14,43 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Portfolio {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long portfolioId;
 
-    private String portfolioText;
 
-    @Lob
-    private String contentJson;
+    @Column(columnDefinition = "json")
+    private String userInfoJson;
+
+    @Column(columnDefinition = "json")
+    private String projectsJson;
+
+    @Column(columnDefinition = "json")
+    private String githubStatsJson;
+
+    @Column(columnDefinition = "json")
+    private String commitMessagesJson;
 
     private LocalDateTime createdAt;
 
-    public static Portfolio from(PortfolioCreateDto dto) {
-        return Portfolio.builder()
-                .portfolioText(dto.getPortfolioText())
-                .createdAt(LocalDateTime.now())
-                .build();
+    public void markPortfolioCreated(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public void updatePortfolio(PortfolioUpdateDto portfolioUpdateDto) {
-        this.portfolioText = portfolioUpdateDto.getPortfolioText();
+    public void saveUserInfoJson(String userInfoJson){
+        this.userInfoJson = userInfoJson;
     }
+
+    public void saveProjectsJson(String projectsJson){
+        this.projectsJson = projectsJson;
+    }
+
+    public void saveGithubStatsJson(String githubStatsJson){
+        this.githubStatsJson = githubStatsJson;
+    }
+
+    public void saveCommitMessagesJson(String commitMessagesJson){
+        this.commitMessagesJson = commitMessagesJson;
+    }
+
+
 }
