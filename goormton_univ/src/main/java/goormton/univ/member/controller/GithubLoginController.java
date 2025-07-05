@@ -2,13 +2,8 @@ package goormton.univ.member.controller;
 
 import goormton.univ.member.service.GithubAuthService;
 import goormton.univ.security.user.CustomUserDetails;
-import goormton.univ.security.util.JwtUtil;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +19,6 @@ import java.util.Map;
 public class GithubLoginController {
 
     private final GithubAuthService githubAuthService;
-    private final JwtUtil jwtUtil;
 
     /**
      * GitHub 로그인 페이지로 리디렉션
@@ -64,45 +58,6 @@ public class GithubLoginController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
-
-//    @GetMapping("/github/callback")
-//    public ResponseEntity<?> handleGithubCallback(
-//            @RequestParam("code") String code,
-//            @RequestParam(value = "state", required = false) String state) {
-//        try {
-//            if (state != null && !state.trim().isEmpty()) {
-//                // 계정 연동 처리
-//                githubAuthService.processGithubLinkCallback(code, state);
-//                return ResponseEntity.ok()
-//                        .contentType(MediaType.TEXT_HTML)
-//                        .body("<html><body><h1>GitHub 계정 연동 완료!</h1><script>window.close();</script></body></html>");
-//            } else {
-//                // 일반 로그인 처리
-//                Map<String, Object> authResult = githubAuthService.processGithubLoginCallback(code);
-//
-//                // 테스트 페이지로 리디렉션 (토큰과 함께)
-//                String accessToken = (String) authResult.get("accessToken");
-//                String redirectUrl = "/test-github.html?token=" + accessToken;
-//
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.setLocation(URI.create(redirectUrl));
-//                return ResponseEntity.status(302).headers(headers).build();
-//            }
-//        } catch (Exception e) {
-//            if (state != null && !state.trim().isEmpty()) {
-//                return ResponseEntity.ok()
-//                        .contentType(MediaType.TEXT_HTML)
-//                        .body("<html><body><h1>연동 실패: " + e.getMessage() + "</h1></body></html>");
-//            } else {
-//                // 로그인 실패 시 테스트 페이지로 리디렉션
-//                String redirectUrl = "/test-github.html?error=" + e.getMessage();
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.setLocation(URI.create(redirectUrl));
-//                return ResponseEntity.status(302).headers(headers).build();
-//            }
-//        }
-//    }
-
 
     @GetMapping("/link/github/{memberId}")
     public ResponseEntity<String> startGithubLink(@PathVariable Long memberId) {
@@ -149,15 +104,6 @@ public class GithubLoginController {
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
-    }
-
-    @GetMapping("/test/link/github/{memberId}")
-    public ResponseEntity<String> testGithubLink(@PathVariable Long memberId) {
-        String githubLinkUrl = githubAuthService.getGithubAuthUrl();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(githubLinkUrl));
-        return ResponseEntity.status(302).headers(headers).build();
     }
 
 }
