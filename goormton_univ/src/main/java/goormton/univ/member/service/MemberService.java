@@ -69,6 +69,7 @@ public class MemberService {
                 .thenAccept(profileImageUrl -> {
                     System.out.println("업로드된 이미지 URL: " + profileImageUrl);
                     Member member = new Member(request.getEmail(), encodedPassword, request.getNickName(), profileImageUrl, request.getName());
+                    member.setProvider("LOCAL");
                     member.setCreatedAt(LocalDateTime.now());
                     memberRepository.save(member);
                     System.out.println("회원 저장 완료");
@@ -235,56 +236,6 @@ public class MemberService {
 
         memberRepository.delete(member);
     }
-
-//    /**
-//     * 카카오 로그인 회원 처리
-//     */
-//    @Transactional
-//    public Member handleKakaoLogin(KakaoUserDto kakaoUser) {
-//        Optional<Member> existingMember = memberRepository.findByEmail(kakaoUser.getEmail());
-//
-//        if (existingMember.isPresent()) {
-//            return existingMember.get();
-//        } else {
-//            String randomPassword = passwordEncoder.encode(UUID.randomUUID().toString());
-//
-//            Member newMember = new Member(
-//                    kakaoUser.getEmail(),
-//                    randomPassword,
-//                    kakaoUser.getNickname(),
-//                    kakaoUser.getProfileImageUrl(),
-//                    kakaoUser.getNickname()
-//            );
-//            newMember.setCreatedAt(LocalDateTime.now());
-//            memberRepository.save(newMember);
-//            return newMember;
-//        }
-//    }
-//
-//    /**
-//     * 네이버 로그인 회원 처리
-//     */
-//    @Transactional
-//    public Member handleNaverLogin(NaverUserDto naverUser) {
-//        Optional<Member> existingMember = memberRepository.findByEmail(naverUser.getEmail());
-//
-//        if (existingMember.isPresent()) {
-//            return existingMember.get();
-//        } else {
-//            String randomPassword = passwordEncoder.encode(UUID.randomUUID().toString());
-//
-//            Member newMember = new Member(
-//                    naverUser.getEmail(),
-//                    randomPassword,
-//                    naverUser.getName(),
-//                    naverUser.getProfileImage(),
-//                    naverUser.getName()
-//            );
-//            newMember.setCreatedAt(LocalDateTime.now());
-//            memberRepository.save(newMember);
-//            return newMember;
-//        }
-//    }
 
     /**
      * 로그아웃
