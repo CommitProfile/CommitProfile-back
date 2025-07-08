@@ -1,8 +1,8 @@
 package goormton.univ.project.controller;
 
 import goormton.univ.project.dto.ProjectRequest;
-import goormton.univ.project.dto.ProjectResponse;
-import goormton.univ.project.service.ProjectService;
+import goormton.univ.project.dto.ProjectDetailResponse;
+import goormton.univ.project.dto.ProjectSummaryResponse;import goormton.univ.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,20 +23,20 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponse> getProject(@PathVariable Long id){
-        ProjectResponse response = projectService.searchById(id);
+    public ResponseEntity<ProjectDetailResponse> getProject(@PathVariable Long id){
+        ProjectDetailResponse response = projectService.searchById(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProjectResponse>> getAllProjects(){
-        List<ProjectResponse> responseList = projectService.searchAll();
+    public ResponseEntity<List<ProjectSummaryResponse>> getAllProjects(){
+        List<ProjectSummaryResponse> responseList = projectService.searchAll();
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/search") //예시
-    public ResponseEntity<List<ProjectResponse>> searchByPeriod(@RequestParam String keyword) {
-        List<ProjectResponse> responseList = projectService.searchByPeriod(keyword);
+    @GetMapping("/search")
+    public ResponseEntity<List<ProjectSummaryResponse>> searchByYear(@RequestParam int year) {
+        List<ProjectSummaryResponse> responseList = projectService.searchByYear(year);
         return ResponseEntity.ok(responseList);
     }
 
