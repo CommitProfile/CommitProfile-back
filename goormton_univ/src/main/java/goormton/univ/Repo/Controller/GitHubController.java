@@ -3,9 +3,10 @@ package goormton.univ.Repo.Controller;
 import goormton.univ.Repo.Dto.GitHubRequest;
 import goormton.univ.Repo.Dto.GitHubResponse;
 import goormton.univ.Repo.Service.GitHubService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/Repo")
@@ -18,13 +19,8 @@ public class GitHubController {
     }
 
     @PostMapping
-    public ResponseEntity<GitHubResponse> fetchRepositoryInfo(@RequestBody GitHubRequest request) {
-        try {
-            GitHubResponse response = gitHubService.getRepositoryInfo(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public ResponseEntity<List<GitHubResponse>> fetchRepositoriesInfo(@RequestBody GitHubRequest request) throws Exception {
+        List<GitHubResponse> responseList = gitHubService.getRepositoriesInfo(request);
+        return ResponseEntity.ok(responseList);
     }
-
 }
