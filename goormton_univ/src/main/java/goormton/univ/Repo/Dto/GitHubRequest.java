@@ -1,6 +1,3 @@
 package goormton.univ.Repo.Dto;
 
-public record GitHubRequest(
-        String repoUrl
-) {
-}
+public record GitHubRequest(String profileUrl, String token) { }
